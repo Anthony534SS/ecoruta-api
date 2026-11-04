@@ -12,7 +12,7 @@ DB_CONFIG = {
     'port': 21716,
     'user': 'avnadmin',
     'password': 'AVNS_Yum4uq8V_ok00akE24o',
-    'database': 'defaultdb'  # Cambia a 'ecoruta_db' si creaste las tablas en esa BD
+    'database': 'ecoruta_db'  # Cambia a 'ecoruta_db' si creaste las tablas en esa BD
 }
 
 def get_db():
