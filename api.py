@@ -187,8 +187,13 @@ def eliminar_reporte(reporte_id: int, usuario_id: Optional[int] = None, es_admin
     db.close()
     return {"ok": True}
 
+class MensajeSchema(BaseModel):
+    contenido: str
+    usuario_id: int
+    reporte_id: Optional[int] = None
+
 @app.post("/mensajes")
-def enviar_mensaje_api(data: MensajeSchema):
+def enviar_mensaje(data: MensajeSchema):
     db = get_db()
     cursor = db.cursor()
     fecha_hora = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
@@ -200,7 +205,7 @@ def enviar_mensaje_api(data: MensajeSchema):
     
     db.commit()
     db.close()
-    return {"ok": True, "mensaje": "Mensaje enviado."}
+    return {"ok": True, "mensaje": "Mensaje enviado exitosamente."}
 
 
 # ---------------- USUARIOS Y PERFIL ----------------
