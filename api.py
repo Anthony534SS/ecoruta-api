@@ -217,4 +217,48 @@ def actualizar_perfil(usuario_id: int, data: ActualizarPerfilSchema):
         pwd_cifrada = cifrar_contrasena(data.nueva_contrasena)
         cursor.execute("""
             UPDATE usuarios SET nombre = %s, email = %s, contrasena = %s WHERE id = %s
-        """, (data.nombre.strip(), email
+        """, (data.nombre.strip(), email_clean, pwd_cifrada, usuario_id))
+    else:
+        cursor.execute("""
+            UPDATE usuarios SET nombre = %s, email = %s WHERE id = %s
+        """, (data.nombre.strip(), email_clean, usuario_id))
+        
+    db.commit()
+    
+    cursor.execute("SELECT id, nombre, email, rol FROM usuarios WHERE id = %s", (usuario_id,))
+    usuario_actualizado = cursor.fetchone()
+    db.close()
+    
+    return {"ok": True, "usuario": usuario_actualizado}
+
+@app.get("/auth/seed-admin")
+def seed_admin_endpoint():
+    email = "admin@ecoruta.mx"
+    password_plana = "EcoRuta2026"
+    nombre = "Administrador EcoRuta"
+    rol = "admin"
+    
+    pwd_cifrada = cifrar_contrasena(password_plana)
+
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+
+    cursor.execute("SELECT id FROM usuarios WHERE email = %s", (email,))
+    user = cursor.fetchone()
+
+    if user:
+        cursor.execute(
+            "UPDATE usuarios SET contrasena = %s, rol = %s WHERE email = %s",
+            (pwd_cifrada, rol, email)
+        )
+        mensaje = "Administrador actualizado con éxito."
+    else:
+        cursor.execute(
+            "INSERT INTO usuarios (nombre, email, contrasena, rol) VALUES (%s, %s, %s, %s)",
+            (nombre, email, pwd_cifrada, rol)
+        )
+        mensaje = "Administrador creado con éxito."
+
+    db.commit()
+    db.close()
+    return {"ok": True, "mensaje": mensaje}
